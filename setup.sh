@@ -10,14 +10,18 @@ PYTHON_VERSION="${PYTHON_VERSION:-3.8}"
 INSTALL_CUDA_TORCH="${INSTALL_CUDA_TORCH:-1}"
 DOWNLOAD_WEIGHTS="${DOWNLOAD_WEIGHTS:-1}"
 DOWNLOAD_DATASETS="${DOWNLOAD_DATASETS:-1}"
+DOWNLOAD_DATASETS_FROM_HF="${DOWNLOAD_DATASETS_FROM_HF:-0}"
 DOWNLOAD_SYNTHEWORLD="${DOWNLOAD_SYNTHEWORLD:-1}"
 HF_REPO="${HF_REPO:-YixuanMa/rs3dada-checkpoints}"
+DATASET_HF_REPO="${DATASET_HF_REPO:-YixuanMa/evaluation-synthetic-dataset-data}"
 
 echo "📦 Setting up Evaluation_synthetic_dataset environment..."
 echo "  Environment: ${ENV_NAME}"
 echo "  Python: ${PYTHON_VERSION}"
 echo "  Download Weights: ${DOWNLOAD_WEIGHTS}"
 echo "  Download Datasets: ${DOWNLOAD_DATASETS}"
+echo "  Download Datasets From HF: ${DOWNLOAD_DATASETS_FROM_HF}"
+echo "  Dataset HF Repo: ${DATASET_HF_REPO}"
 
 # Load conda
 source /home/projectx/miniconda/etc/profile.d/conda.sh || {
@@ -71,8 +75,30 @@ else
     echo "⏭️ Skipping weight download (DOWNLOAD_WEIGHTS=0)"
 fi
 
-# Optional: Download datasets and payloads from public sources.
-if [[ "${DOWNLOAD_DATASETS}" == "1" ]]; then
+# Optional: Download datasets from Hugging Face dataset repo.
+if [[ "${DOWNLOAD_DATASETS_FROM_HF}" == "1" ]]; then
+    echo "📥 Downloading Dataset/ from Hugging Face dataset repo: ${DATASET_HF_REPO}"
+    ROOT_DIR_ENV="${ROOT_DIR}" \
+    DATASET_HF_REPO_ENV="${DATASET_HF_REPO}" \
+    /home/projectx/miniconda/bin/python - <<'PYTHON_EOF'
+import os
+from huggingface_hub import snapshot_download
+
+root_dir = os.environ["ROOT_DIR_ENV"]
+repo_id = os.environ["DATASET_HF_REPO_ENV"]
+
+snapshot_download(
+    repo_id=repo_id,
+    repo_type="dataset",
+    local_dir=root_dir,
+    local_dir_use_symlinks=False,
+    resume_download=True,
+    allow_patterns=["Dataset/**"],
+)
+
+print(f"[hf] dataset snapshot synced from {repo_id} to {root_dir}")
+PYTHON_EOF
+elif [[ "${DOWNLOAD_DATASETS}" == "1" ]]; then
     echo "📥 Downloading datasets from public sources..."
     bash "${ROOT_DIR}/Experiment1/down_all.sh"
 
@@ -83,8 +109,8 @@ if [[ "${DOWNLOAD_DATASETS}" == "1" ]]; then
             }
     fi
 else
-    echo "⏭️ Skipping dataset download (DOWNLOAD_DATASETS=0)"
-    echo "   Set DOWNLOAD_DATASETS=1 to fetch public datasets via the bundled download scripts."
+    echo "⏭️ Skipping dataset download"
+    echo "   Use DOWNLOAD_DATASETS_FROM_HF=1 for HF snapshot or DOWNLOAD_DATASETS=1 for public sources."
 fi
 
 # Basic post-setup sanity checks
@@ -109,6 +135,8 @@ echo "  2. Run experiments (e.g.): cd Experiment1 && bash evaluation.sh"
 echo ""
 echo "Optional: Download weights after setup"
 echo "  DOWNLOAD_WEIGHTS=1 bash setup.sh"
+echo "Optional: Download Dataset/ from Hugging Face dataset repo"
+echo "  DOWNLOAD_DATASETS_FROM_HF=1 DATASET_HF_REPO=YixuanMa/evaluation-synthetic-dataset-data bash setup.sh"
 echo "Optional: Download public datasets"
 echo "  DOWNLOAD_DATASETS=1 bash setup.sh"
 echo ""
