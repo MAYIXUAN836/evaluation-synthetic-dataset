@@ -8,13 +8,16 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_NAME="${ENV_NAME:-synrs3d}"
 PYTHON_VERSION="${PYTHON_VERSION:-3.8}"
 INSTALL_CUDA_TORCH="${INSTALL_CUDA_TORCH:-1}"
-DOWNLOAD_WEIGHTS="${DOWNLOAD_WEIGHTS:-0}"
-HF_REPO="${HF_REPO:-YOUR_NAME/rs3dada-checkpoints}"
+DOWNLOAD_WEIGHTS="${DOWNLOAD_WEIGHTS:-1}"
+DOWNLOAD_DATASETS="${DOWNLOAD_DATASETS:-1}"
+DOWNLOAD_SYNTHEWORLD="${DOWNLOAD_SYNTHEWORLD:-1}"
+HF_REPO="${HF_REPO:-YixuanMa/rs3dada-checkpoints}"
 
 echo "📦 Setting up Evaluation_synthetic_dataset environment..."
 echo "  Environment: ${ENV_NAME}"
 echo "  Python: ${PYTHON_VERSION}"
 echo "  Download Weights: ${DOWNLOAD_WEIGHTS}"
+echo "  Download Datasets: ${DOWNLOAD_DATASETS}"
 
 # Load conda
 source /home/projectx/miniconda/etc/profile.d/conda.sh || {
@@ -48,7 +51,7 @@ conda install -y gdal
 # Install Python dependencies
 echo "📥 Installing Python packages..."
 pip install -U pip
-pip install albumentations tqdm ever-beta==0.2.3 huggingface_hub rasterio
+pip install albumentations tqdm ever-beta==0.2.3 huggingface_hub rasterio requests beautifulsoup4
 
 # Optional: Download model weights from Hugging Face
 if [[ "${DOWNLOAD_WEIGHTS}" == "1" ]]; then
@@ -68,6 +71,35 @@ else
     echo "⏭️ Skipping weight download (DOWNLOAD_WEIGHTS=0)"
 fi
 
+# Optional: Download datasets and payloads from public sources.
+if [[ "${DOWNLOAD_DATASETS}" == "1" ]]; then
+    echo "📥 Downloading datasets from public sources..."
+    bash "${ROOT_DIR}/Experiment1/down_all.sh"
+
+    if [[ "${DOWNLOAD_SYNTHEWORLD}" == "1" ]]; then
+        python "${ROOT_DIR}/Experiment1/download_syntheworld.py" \
+            --synthetic-root "${ROOT_DIR}/Dataset/synthetic_dataset" || {
+                echo "⚠️ SyntheWorld payload download skipped or failed"
+            }
+    fi
+else
+    echo "⏭️ Skipping dataset download (DOWNLOAD_DATASETS=0)"
+    echo "   Set DOWNLOAD_DATASETS=1 to fetch public datasets via the bundled download scripts."
+fi
+
+# Basic post-setup sanity checks
+for required_path in "${ROOT_DIR}/SynRS3D/pretrain/RS3DAda_vitl_DPT_height.pth" "${ROOT_DIR}/SynRS3D/pretrain/RS3DAda_vitl_DPT_segmentation.pth"; do
+    if [[ -f "${required_path}" ]]; then
+        echo "✓ Found model: ${required_path##*/}"
+    else
+        echo "⚠️ Missing model: ${required_path##*/}"
+    fi
+done
+
+if [[ -d "${ROOT_DIR}/Dataset" ]]; then
+    echo "✓ Dataset root present: ${ROOT_DIR}/Dataset"
+fi
+
 echo ""
 echo "✅ Setup complete for ${ENV_NAME}!"
 echo ""
@@ -77,4 +109,6 @@ echo "  2. Run experiments (e.g.): cd Experiment1 && bash evaluation.sh"
 echo ""
 echo "Optional: Download weights after setup"
 echo "  DOWNLOAD_WEIGHTS=1 bash setup.sh"
+echo "Optional: Download public datasets"
+echo "  DOWNLOAD_DATASETS=1 bash setup.sh"
 echo ""

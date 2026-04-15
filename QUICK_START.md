@@ -4,7 +4,7 @@
 
 ### 1. 克隆仓库
 ```bash
-git clone git@github.com:YOUR_NAME/evaluation-synthetic-dataset.git
+git clone git@github.com:MAYIXUAN836/evaluation-synthetic-dataset.git
 cd evaluation-synthetic-dataset
 ```
 
@@ -16,6 +16,11 @@ bash setup.sh
 ### 3. 下载权重（可选）
 ```bash
 DOWNLOAD_WEIGHTS=1 bash setup.sh
+```
+
+### 4. 下载公开数据（默认开启，体量很大）
+```bash
+DOWNLOAD_DATASETS=1 bash setup.sh
 ```
 
 ## 运行 Experiment1
@@ -65,11 +70,14 @@ ENV_NAME=my_synrs3d bash setup.sh
 # 跳过 CUDA PyTorch 安装（装 CPU 版本）
 INSTALL_CUDA_TORCH=0 bash setup.sh
 
-# 立刻下载权重
+# 立刻下载权重（默认开启）
 DOWNLOAD_WEIGHTS=1 bash setup.sh
 
-# 自定义 HF 仓库（默认 YOUR_NAME/rs3dada-checkpoints）
-HF_REPO=username/custom-checkpoints bash setup.sh
+# 立刻下载公开数据（默认开启）
+DOWNLOAD_DATASETS=1 bash setup.sh
+
+# 自定义 HF 仓库（默认 YixuanMa/rs3dada-checkpoints）
+HF_REPO=YixuanMa/rs3dada-checkpoints bash setup.sh
 ```
 
 ## 常见问题

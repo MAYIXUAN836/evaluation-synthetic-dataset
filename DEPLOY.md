@@ -28,8 +28,8 @@ git commit -m "Initial commit: Evaluation synthetic dataset with RS3DAda baselin
 git branch -M main
 
 # 添加远程仓库
-# 替换 YOUR_NAME 为你的 GitHub 用户名
-git remote add origin git@github.com:YOUR_NAME/evaluation-synthetic-dataset.git
+# 仓库地址已写成 MAYIXUAN836
+git remote add origin git@github.com:MAYIXUAN836/evaluation-synthetic-dataset.git
 
 # 推送到 GitHub
 git push -u origin main
@@ -55,12 +55,12 @@ huggingface-cli repo create rs3dada-checkpoints --type model
 # 从仓库根目录执行
 cd /home/projectx/Evaluation_synthetic_dataset
 
-# 上传两个权重文件（替换 YOUR_NAME）
-huggingface-cli upload YOUR_NAME/rs3dada-checkpoints \
+# 上传两个权重文件（替换为你的 HF namespace）
+huggingface-cli upload YixuanMa/rs3dada-checkpoints \
   SynRS3D/pretrain/RS3DAda_vitl_DPT_height.pth \
   RS3DAda_vitl_DPT_height.pth
 
-huggingface-cli upload YOUR_NAME/rs3dada-checkpoints \
+huggingface-cli upload YixuanMa/rs3dada-checkpoints \
   SynRS3D/pretrain/RS3DAda_vitl_DPT_segmentation.pth \
   RS3DAda_vitl_DPT_segmentation.pth
 ```
@@ -72,7 +72,7 @@ python << 'EOF'
 from huggingface_hub import HfApi
 
 api = HfApi()
-repo_id = "YOUR_NAME/rs3dada-checkpoints"
+repo_id = "YixuanMa/rs3dada-checkpoints"
 
 # 上传权重
 api.upload_file(
@@ -105,7 +105,7 @@ git remote -v
 
 ### 验证 Hugging Face 上传
 
-访问 `https://huggingface.co/YOUR_NAME/rs3dada-checkpoints` 检查文件
+访问 `https://huggingface.co/YixuanMa/rs3dada-checkpoints` 检查文件
 
 ### 更新 setup.sh 中的 HF_REPO
 
@@ -113,14 +113,14 @@ git remote -v
 
 ```bash
 # 第 9 行附近，改为
-HF_REPO="${HF_REPO:-YOUR_NAME/rs3dada-checkpoints}"
+HF_REPO="${HF_REPO:-YixuanMa/rs3dada-checkpoints}"
 ```
 
 ## Step 4: 用户快速开始（验证流程）
 
 ```bash
 # 克隆代码仓库
-git clone git@github.com:YOUR_NAME/evaluation-synthetic-dataset.git
+git clone git@github.com:MAYIXUAN836/evaluation-synthetic-dataset.git
 cd evaluation-synthetic-dataset
 
 # 一键装环境
@@ -146,7 +146,7 @@ A: 仓库设为公开，或确保已执行 `huggingface-cli login`
 **Q: Git push 失败（拒绝连接）？**  
 A: 检查 SSH key 是否正确配置或改用 HTTPS：  
 ```bash
-git remote set-url origin https://github.com/YOUR_NAME/evaluation-synthetic-dataset.git
+git remote set-url origin https://github.com/MAYIXUAN836/evaluation-synthetic-dataset.git
 ```
 
 ---
