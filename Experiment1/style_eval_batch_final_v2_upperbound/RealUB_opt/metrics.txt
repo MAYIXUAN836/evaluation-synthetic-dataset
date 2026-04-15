@@ -1,0 +1,5 @@
+FID (reference real vs upper-bound real): 196.416035
+KID (reference real vs upper-bound real): 0.038838
+IS (upper-bound real): 3.537996
+CLIP-IQA (upper-bound real): 0.578837
+source_dir: /home/projectx/Evaluation_synthetic_dataset/Dataset/real_dataset/GeoNRW/opt

@@ -1,0 +1,4 @@
+FID (real vs synthetic): 355.299385
+KID (real vs synthetic): 0.179796
+IS (synthetic): 2.823024
+CLIP-IQA (synthetic): 0.339234
